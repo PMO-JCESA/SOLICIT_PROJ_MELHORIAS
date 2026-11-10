@@ -100,6 +100,26 @@
   .done p{color:var(--muted)}
 
   footer{text-align:center;color:var(--muted);font-size:.85rem;padding:0 16px 32px}
+
+  /* ===== Dicas de preenchimento ===== */
+  .lbl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tip-btn{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--brand);background:#fff;color:var(--brand);
+    font:700 .78rem/1 Manrope,system-ui,sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;transition:.15s}
+  .tip-btn:hover,.tip-btn[aria-expanded="true"]{background:var(--brand);color:#fff}
+  .tip-box{font-weight:400;font-size:.87rem;line-height:1.45;color:var(--text);background:#F3F4F7;border-left:4px solid var(--accent);
+    border-radius:8px;padding:10px 12px}
+  .tip-box p{margin:0 0 6px}.tip-box p:last-child{margin:0}
+  .tip-box .ex{color:var(--muted);white-space:pre-line}
+  .tip-box .ex b{color:var(--text)}
+  .na-btn{font:600 .82rem Manrope,system-ui,sans-serif;color:var(--brand);background:#fff;border:1px solid var(--brand);border-radius:999px;
+    padding:4px 12px;cursor:pointer;margin-top:4px}
+  .na-btn:hover{background:var(--brand);color:#fff}
+  .na-date{align-self:flex-start;font:500 .85rem Manrope,system-ui,sans-serif;color:var(--muted);background:none;border:0;padding:2px 0;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px}
+  .na-date .box{width:16px;height:16px;border:1.5px solid var(--muted);border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff}
+  .na-date[aria-pressed="true"]{color:var(--brand);font-weight:700}
+  .na-date[aria-pressed="true"] .box{background:var(--brand);border-color:var(--brand)}
+  input.is-na{opacity:.45;pointer-events:none}
 </style>
 </head>
 <body>
@@ -342,7 +362,7 @@
     <div class="done">
       <div class="check">✓</div>
       <h2>Solicitação enviada</h2>
-      <p>Recebemos a sua solicitação. Entraremos em contato pelo e-mail informado.</p>
+      <p>Recebemos a sua solicitação. A gestão vai analisá-la e você receberá a decisão (aceite ou reprovação, com a justificativa) no e-mail informado.</p>
       <p style="margin-top:20px"><button class="primary" type="button" id="newBtn">Nova solicitação</button></p>
     </div>
   </section>
@@ -425,6 +445,98 @@
     showView(home);
   });
 
+  // ====== DICAS DE PREENCHIMENTO ======
+  // na: texto preenchido pelo botão "Não sei" (null = campo essencial, sem opção N/A) · data: campo de data com "Ainda não sei"
+  const DICAS = {
+    patrocinador:{t:'Quem aprova e responde pelo projeto na sua área (gestor ou diretor).',ex:'Carlos Lima – Gerente Comercial',na:'A definir'},
+    justificativa:{t:'Conte qual é o problema hoje (ou a oportunidade) e o impacto de não fazer nada.',ex:'Hoje o relatório de vendas é montado à mão, leva 2 dias por mês e tem erros frequentes.',na:null},
+    objetivo_geral:{t:'Uma frase com o resultado principal esperado. Comece com um verbo.',ex:'Automatizar a emissão do relatório mensal de vendas.',na:null},
+    objetivos_especificos:{t:'Desdobre o objetivo geral em metas que dá para medir, uma por linha.',ex:'Reduzir o tempo de emissão de 2 dias para 2 horas\nEliminar a digitação manual',na:'N/A'},
+    escopo:{t:'O que será entregue: sistemas, processos, áreas e atividades envolvidas.',ex:'Integração do ERP com o Power BI e um painel mensal para a equipe comercial.',na:null},
+    fora_escopo:{t:'O que NÃO será feito, para evitar expectativas erradas.',ex:'Relatórios de outras áreas; mudanças no ERP.',na:'N/A'},
+    beneficios_quant_projeto:{t:'Ganhos que dá para medir: tempo, dinheiro, volume, erros.',ex:'Economia de 16 horas/mês; redução de 90% nos erros.',na:'N/A'},
+    beneficios_qual_projeto:{t:'Ganhos difíceis de medir: satisfação, segurança, imagem, padronização.',ex:'Mais confiança nos números e decisões mais rápidas.',na:'N/A'},
+    premissas:{t:'O que você considera verdadeiro para o projeto dar certo.',ex:'A área comercial vai liberar 1 pessoa para validar os testes.',na:'N/A'},
+    restricoes:{t:'Limites que não podem mudar: data, orçamento, tecnologia, equipe.',ex:'Precisa estar pronto antes do fechamento anual; usar só ferramentas Microsoft.',na:'N/A'},
+    riscos:{t:'O que pode dar errado e como evitar.',ex:'Dados do ERP incompletos → validar a base antes de começar.',na:'N/A'},
+    data_inicio:{t:'Data sugerida para começar. Se ainda não souber, marque "Ainda não sei a data".',data:true},
+    data_termino:{t:'Até quando o projeto precisa estar pronto. Se ainda não souber, marque "Ainda não sei a data".',data:true},
+    marcos:{t:'As principais etapas do projeto, com o mês aproximado.',ex:'Levantamento (jan/27) · Desenvolvimento (fev/27) · Implantação (mar/27)',na:'A definir'},
+    orcamento:{t:'Valor aproximado, se houver. O PMO ajuda a estimar depois.',ex:'R$ 80.000',na:'A definir'},
+    equipe:{t:'Pessoas ou perfis que vão participar.',ex:'1 analista de TI, 1 usuário da área de vendas.',na:'A definir'},
+    tipo_referencia:{t:'Indique se a melhoria se refere a um projeto, processo, rotina, sistema ou outro item.'},
+    nome_referencia:{t:'Nome ou código pelo qual o item é conhecido na empresa.',ex:'TAP-123 · Processo de faturamento · Rotina de fechamento mensal',na:'N/A'},
+    situacao_atual:{t:'Como funciona hoje e qual é o problema.',ex:'O cadastro de clientes não tem campo de CNPJ, e o time anota em planilha à parte.',na:null},
+    descricao_melhoria:{t:'O que deve mudar e como deve funcionar depois.',ex:'Incluir o campo CNPJ no cadastro, com validação automática do número.',na:null},
+    beneficios_quant_melhoria:{t:'Ganhos que dá para medir: tempo, dinheiro, volume, erros.',ex:'Redução de 2 horas por semana.',na:'N/A'},
+    beneficios_qual_melhoria:{t:'Ganhos difíceis de medir: menos retrabalho, padronização, experiência do usuário.',ex:'Menos retrabalho e cadastro mais confiável.',na:'N/A'},
+    prazo_melhoria:{t:'Data em que a melhoria é desejada. Se ainda não souber, marque "Ainda não sei a data".',data:true},
+    prioridade:{t:'Baixa: sem urgência · Média: prazo normal · Alta: impacta a operação · Urgente: parada ou risco imediato. Na dúvida, deixe Média.'},
+    links:{t:'Links de planilhas, documentos, prints ou processos que ajudem a entender o pedido.',ex:'https://nordtechmaquinas.sharepoint.com/…',na:'Não há'}
+  };
+
+  function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  function marcarDataNA(el, btn, ativo){
+    el.dataset.na = ativo ? '1' : '';
+    el.required = !ativo;
+    el.classList.toggle('is-na', ativo);
+    el.classList.remove('invalid');
+    if (ativo) el.value = '';
+    btn.setAttribute('aria-pressed', ativo ? 'true' : 'false');
+    btn.querySelector('.box').textContent = ativo ? '✓' : '';
+  }
+
+  Object.entries(DICAS).forEach(([nome, d], i) => {
+    const el = form.querySelector(`[name="${nome}"]`);
+    const label = el && el.closest('label.field');
+    if (!label) return;
+    // A dica substitui o texto de ajuda fixo (<small>) que existia no campo
+    label.querySelectorAll(':scope > small').forEach(s => s.remove());
+    // Linha do rótulo: texto + ícone
+    const txt = label.firstChild;
+    const linha = document.createElement('span');
+    linha.className = 'lbl';
+    linha.append(txt.textContent.trim());
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'tip-btn'; btn.textContent = '?';
+    btn.setAttribute('aria-label', 'Dica de preenchimento'); btn.setAttribute('aria-expanded', 'false');
+    const id = 'dica-' + i; btn.setAttribute('aria-controls', id);
+    linha.append(btn);
+    label.replaceChild(linha, txt);
+    // Caixa da dica
+    const box = document.createElement('div');
+    box.className = 'tip-box'; box.id = id; box.hidden = true;
+    box.innerHTML = `<p>${esc(d.t)}</p>` + (d.ex ? `<p class="ex"><b>Exemplo:</b> ${esc(d.ex)}</p>` : '') +
+      (d.na ? `<button type="button" class="na-btn">Não sei · preencher "${esc(d.na)}"</button>` : '');
+    linha.after(box);
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const abrir = box.hidden; box.hidden = !abrir; btn.setAttribute('aria-expanded', String(abrir));
+    });
+    const naBtn = box.querySelector('.na-btn');
+    if (naBtn) naBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      el.value = d.na; el.classList.remove('invalid');
+      box.hidden = true; btn.setAttribute('aria-expanded', 'false');
+    });
+    // Datas: opção "Ainda não sei a data" (envia "A definir")
+    if (d.data) {
+      const nd = document.createElement('button');
+      nd.type = 'button'; nd.className = 'na-date'; nd.setAttribute('aria-pressed', 'false');
+      nd.innerHTML = '<span class="box"></span>Ainda não sei a data';
+      el.after(nd);
+      nd.addEventListener('click', (e) => { e.preventDefault(); marcarDataNA(el, nd, el.dataset.na !== '1'); });
+    }
+  });
+
+  // Ao limpar o formulário, desfaz as marcações de "Ainda não sei" e fecha as dicas
+  form.addEventListener('reset', () => setTimeout(() => {
+    form.querySelectorAll('.na-date').forEach(nd => marcarDataNA(nd.previousElementSibling, nd, false));
+    form.querySelectorAll('.tip-box').forEach(b => b.hidden = true);
+    form.querySelectorAll('.tip-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  }, 0));
+
   form.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     setStatus('');
@@ -433,7 +545,7 @@
     form.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
     const vazios = [];
     form.querySelectorAll('input,select,textarea').forEach(el => {
-      if (el.disabled || el.type === 'hidden' || el.name === 'website') return;
+      if (el.disabled || el.type === 'hidden' || el.type === 'checkbox' || el.name === 'website' || el.dataset.na === '1') return;
       if (!String(el.value).trim()) vazios.push(el);
     });
     if (vazios.length) {
@@ -462,21 +574,36 @@
     const nome = form.querySelector('[name="nome"]').value.trim();
     const setor = form.querySelector('[name="setor"]').value.trim();
     const email = form.querySelector('[name="email"]').value.trim();
+    const ehTeste = false; // opção de TESTE removida do formulário
 
     // Monta o e-mail com rótulos legíveis, apenas com os campos ativos
     const payload = {
       access_key: ACCESS_KEY,
-      subject: `[${tipo === 'projeto' ? 'PROJETO' : 'MELHORIA'}] ${tituloEl.value.trim()} — ${nome} (${setor})`,
+      subject: `[${tipo === 'projeto' ? 'PROJETO' : 'MELHORIA'}] ${tituloEl.value.trim()} — ${nome} (${setor})${ehTeste ? ' [TESTE]' : ''}`,
       from_name: 'Solicitações JCESA',
       replyto: email,
-      Tipo: tipo === 'projeto' ? 'Projeto' : 'Melhoria'
+      Tipo: tipo === 'projeto' ? 'Projeto' : 'Melhoria',
+      Ambiente: ehTeste ? 'TESTE' : 'Produção'
     };
 
     form.querySelectorAll('[data-label]').forEach(el => {
       if (el.disabled) return;
-      const valor = (el.value || '').trim();
+      const valor = el.dataset.na === '1' ? 'A definir' : (el.value || '').trim();
       if (valor) payload[el.dataset.label] = valor;
     });
+
+    // Dados estruturados para o Power Automate criar o item na lista "Solicitações PMO" (não remover)
+    const g = (k) => payload[k] || '';
+    const dados = {
+      tipo: payload.Tipo, ambiente: payload.Ambiente, titulo: tituloEl.value.trim(),
+      solicitante: nome, email: email, setor: setor, prioridade: g('Prioridade'),
+      prazo: [g('Término desejado'), g('Prazo desejado')].find(v => /^\d{4}-\d{2}-\d{2}$/.test(v)) || '',
+      referencia: g('Nome ou código da referência'),
+      detalhes: Object.keys(payload)
+        .filter(k => !['access_key','subject','from_name','replyto'].includes(k))
+        .map(k => k + ': ' + payload[k]).join('\n')
+    };
+    payload['Dados (sistema)'] = 'JCESA64:' + btoa(unescape(encodeURIComponent(JSON.stringify(dados)))) + ':FIM';
 
     submitBtn.disabled = true;
     setStatus('Enviando…');

@@ -629,6 +629,34 @@
   });
   $('#editBtn').addEventListener('click', () => mostrar('#formView'));
 
+
+  // ====== Texto de detalhes do PDF: em seções, com tópicos (sem repetir o cabeçalho) ======
+  function detalhesFormatado(){
+    const pular = ['tipo','titulo','departamento','solicitante','email'];   // já aparecem no cabeçalho do PDF
+    const opcionais = ['escopo_desc','escopo_link','aut_link','aut_falha','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
+    const out = [];
+    ordem().forEach(([titulo, campos]) => {
+      const nomes = campos.map(c => Array.isArray(c) ? c[1] : c).filter(n => !pular.includes(n));
+      const itens = [];
+      nomes.forEach(n => {
+        const v = valor(n);
+        if (!v && opcionais.includes(n)) return;
+        itens.push({ rotulo: rotulo(n), vals: v ? (form.querySelector(`[type="checkbox"][name="${n}"]`) ? v.split('; ') : v.split('\n')) : ['—'], lista: !!form.querySelector(`[type="checkbox"][name="${n}"]`) });
+      });
+      if (!itens.length) return;
+      if (out.length) out.push('');
+      out.push(titulo.toUpperCase());
+      itens.forEach(it => {
+        out.push('• ' + it.rotulo);
+        it.vals.forEach(line => {
+          const t = line.trim();
+          out.push(it.lista ? '      – ' + t : '      ' + t);
+        });
+      });
+    });
+    return out.join('\n');
+  }
+
   // ====== Envio (Web3Forms → e-mail do PMO → Fluxo 1 grava na lista) ======
   const ACCESS_KEY = '828f1301-787b-4abe-b51b-41e01300d73f';
   const ENDPOINT = 'https://api.web3forms.com/submit';
@@ -641,7 +669,7 @@
     const tipo = valor('tipo'), titulo = valor('titulo'), nome = valor('solicitante'), depto = valor('departamento');
     const campos = {}; (ehAut() ? CAMPOS_AUT : CAMPOS_PM).forEach(n => campos[n] = valor(n));
     const ls = linhas();
-    const detalhes = (AJ.id ? `Resposta ao PMO (complemento): ${valor('resposta')}\n` : '') + ls.map(([l, v]) => `${l}: ${v}`).join('\n');
+    const detalhes = detalhesFormatado();
     const dados = { tipo, ambiente: 'Produção', titulo, solicitante: nome, email: valor('email'), setor: depto,
       prioridade: '', prazo: '', referencia: '', beneficio: valor(ehAut() ? 'aut_beneficio' : 'beneficio'), detalhes, campos,
       ajuste: AJ.id || '', token: AJ.token || '', resposta: AJ.id ? valor('resposta') : '' };

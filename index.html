@@ -73,8 +73,8 @@
   .tipo input{position:absolute;opacity:0;pointer-events:none}
   .tipo:has(input:checked){border-color:var(--brand);box-shadow:0 8px 22px rgba(12,27,56,.12)}
   .tipo.mel:has(input:checked){border-color:var(--accent)}
-  .tipo .t{font-size:1.15rem;font-weight:800;color:var(--brand-dark);display:flex;align-items:center;gap:8px}
-  .tipo .check{width:20px;height:20px;border-radius:50%;border:2px solid #b8bfcc;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff}
+  .tipo .t{font-size:1.15rem;font-weight:800;color:var(--brand-dark);display:flex;align-items:flex-start;gap:8px;line-height:1.25;min-height:2.5em}
+  .tipo .check{flex:none;margin-top:2px;width:20px;height:20px;border-radius:50%;border:2px solid #b8bfcc;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff}
   .tipo:has(input:checked) .check{background:var(--brand);border-color:var(--brand)}
   .tipo.mel:has(input:checked) .check{background:var(--accent);border-color:var(--accent)}
   .tipo p{margin:6px 0 8px;color:var(--muted);font-size:.9rem}
@@ -196,9 +196,9 @@
             <span class="rota">Na aprovação: Convertido em Melhoria</span>
           </label>
           <label class="tipo aut">
-            <input type="radio" name="tipo" value="Automação">
-            <span class="t"><span class="check">✓</span> Automação</span>
-            <p>Sua área já criou a automação de um processo com IA e precisa da TI para colocá-la para rodar.</p>
+            <input type="radio" name="tipo" value="Solicitação de publicação">
+            <span class="t"><span class="check">✓</span> Solicitação de publicação</span>
+            <p>A área já criou a automação e precisa da TI para colocá-la para rodar.</p>
             <ul>
               <li>A ideia <b>já foi testada</b> pela área (prompt, agente, fluxo ou planilha)</li>
               <li>A TI avalia <b>segurança, dados e acessos</b></li>
@@ -554,7 +554,7 @@
   }));
 
   // ====== Tipo: Automação usa um formulário próprio (blocos 3 a 5) ======
-  const ehAut = () => form.querySelector('[name="tipo"]:checked')?.value === 'Automação';
+  const ehAut = () => form.querySelector('[name="tipo"]:checked')?.value === 'Solicitação de publicação';
   function trocarGrupo(){ $('#grpAUT').hidden = !ehAut(); $('#grpPM').hidden = ehAut(); }
   form.querySelectorAll('[name="tipo"]').forEach(r => r.addEventListener('change', trocarGrupo));
 
@@ -661,7 +661,7 @@
       $('#doneTitle').textContent = AJ.id ? 'Complemento enviado!' : 'Solicitação enviada!';
       $('#doneMsg').innerHTML = AJ.id
         ? `Obrigado. Sua solicitação <b>${esc(titulo)}</b> voltou para análise do PMO com o status <b>Pré escopo (Em Análise)</b>. Você receberá o retorno por e-mail.`
-        : `${tipo === 'Projeto' ? 'Seu <b>projeto</b>' : tipo === 'Automação' ? 'Sua <b>automação</b>' : 'Sua <b>melhoria</b>'} <b>${esc(titulo)}</b> foi ${tipo === 'Projeto' ? 'registrado' : 'registrada'} com o status <b>Pré escopo (Em Análise)</b>. O PMO vai analisar e você receberá o retorno por e-mail em <b>${esc(valor('email'))}</b>.`;
+        : `${tipo === 'Projeto' ? 'Seu <b>projeto</b>' : tipo === 'Solicitação de publicação' ? 'Sua <b>solicitação de publicação</b>' : 'Sua <b>melhoria</b>'} <b>${esc(titulo)}</b> foi ${tipo === 'Projeto' ? 'registrado' : 'registrada'} com o status <b>Pré escopo (Em Análise)</b>. O PMO vai analisar e você receberá o retorno por e-mail em <b>${esc(valor('email'))}</b>.`;
       if (PROTOTIPO) $('#doneMsg').innerHTML += '<br><br><i>(Protótipo: nada foi enviado.)</i>';
       mostrar('#doneView');
     } catch (err) {
@@ -707,7 +707,7 @@
     const MAPA_AUT = { 'Custo / orçamento': ['aut_horas'], 'Benefícios': ['aut_horas','aut_beneficio'],
       'Escopo': ['aut_processo','aut_hoje','aut_faz','aut_ferramentas','aut_estagio','aut_link'], 'Prazo': ['aut_frequencia'],
       'Processos impactados': ['aut_sistemas','aut_dados'], 'Riscos': ['aut_revisao','aut_falha','aut_dados'], 'Outros': [] };
-    const mapa = campos.tipo === 'Automação' ? MAPA_AUT : MAPA;
+    const mapa = campos.tipo === 'Solicitação de publicação' ? MAPA_AUT : MAPA;
     pend.forEach(x => (mapa[x] || []).forEach(n => form.querySelector(`[name="${n}"]`)?.closest('.f')?.classList.add('pend')));
     $('#ajusteBox').hidden = false;
     $('#ajusteBox textarea').required = true;

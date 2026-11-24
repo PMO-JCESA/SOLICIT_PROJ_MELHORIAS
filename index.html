@@ -25,7 +25,12 @@
   .banner{width:100%;height:auto;display:block;border-radius:var(--radius);margin-bottom:20px}
   h1{font-size:1.6rem;line-height:1.25;margin:0 0 6px;color:var(--brand-dark)}
   .lead{color:var(--muted);margin:0 0 18px}
-  .proto{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;background:#fef3c7;color:#92400e;border-radius:999px;padding:3px 10px;margin-bottom:10px}
+  .tipo{position:relative;display:block;border:2px solid var(--border);border-radius:var(--radius);padding:18px 18px 16px 22px;cursor:pointer;background:#fff;overflow:hidden}
+  .tipo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--brand)}
+  .tipo.mel::before{background:var(--accent)}
+  .tipo input{position:absolute;opacity:0;pointer-events:none}
+  .tipo:has(input:checked){border-color:var(--brand);box-shadow:0 8px 22px rgba(12,27,56,.12)}
+  .tipo.mel:has(input:checked){border-color:var(--accent)}
 
   .block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;margin-bottom:16px}
   .block h2{font-size:1.05rem;margin:0 0 16px;color:var(--brand-dark);display:flex;align-items:center;gap:10px}
@@ -56,24 +61,8 @@
   /* Tipo da demanda */
   .tipos{display:grid;gap:12px;grid-template-columns:1fr}
   @media (min-width:640px){.tipos{grid-template-columns:1fr 1fr}}
-  @media (min-width:900px){.tipos{grid-template-columns:1fr 1fr 1fr}}
-  .tipo.aut::before{background:#2B5BA8}
-  .tipo.aut:has(input:checked){border-color:#2B5BA8}
-  .tipo.aut:has(input:checked) .check{background:#2B5BA8;border-color:#2B5BA8}
-  .checks{border:1px solid #8a8f98;border-radius:6px;padding:6px 10px;background:#fff;display:grid;grid-template-columns:1fr;gap:0 16px}
-  @media (min-width:600px){.checks{grid-template-columns:1fr 1fr}}
-  .checks label{display:flex;gap:10px;align-items:flex-start;padding:7px 2px;cursor:pointer}
-  .checks input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--brand);flex:none}
-  .checks.invalid{border-color:var(--err)}
   .proto{background:#fff4d6;border:1px solid #e8c96a;color:#6b4e00;border-radius:8px;padding:10px 14px;font-size:.88rem;margin:0 0 16px}
-  .aviso-ia{background:#eef1f7;border-left:4px solid var(--brand);border-radius:0 8px 8px 0;padding:10px 14px;font-size:.88rem;margin:0 0 14px}
-  .tipo{position:relative;display:block;border:2px solid var(--border);border-radius:var(--radius);padding:18px 18px 16px 22px;cursor:pointer;background:#fff;overflow:hidden}
-  .tipo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--brand)}
-  .tipo.mel::before{background:var(--accent)}
-  .tipo input{position:absolute;opacity:0;pointer-events:none}
-  .tipo:has(input:checked){border-color:var(--brand);box-shadow:0 8px 22px rgba(12,27,56,.12)}
-  .tipo.mel:has(input:checked){border-color:var(--accent)}
-  .tipo .t{font-size:1.15rem;font-weight:800;color:var(--brand-dark);display:flex;align-items:flex-start;gap:8px;line-height:1.25;min-height:2.5em}
+  .tipo .t{font-size:1.15rem;font-weight:800;color:var(--brand-dark);display:flex;align-items:flex-start;gap:8px;line-height:1.25}
   .tipo .check{flex:none;margin-top:2px;width:20px;height:20px;border-radius:50%;border:2px solid #b8bfcc;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff}
   .tipo:has(input:checked) .check{background:var(--brand);border-color:var(--brand)}
   .tipo.mel:has(input:checked) .check{background:var(--accent);border-color:var(--accent)}
@@ -149,7 +138,7 @@
   <section id="formView">
     <img class="banner" src="data:image/jpeg;base64,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" alt="Juntos, somos um! JCE SA Brazil">
     <h1>Solicitação de Demandas PMO</h1>
-    <p class="lead">Este formulário formaliza a solicitação de uma nova demanda de projeto, melhoria ou automação de processo de TI e coleta as principais informações sobre necessidades, oportunidades ou problemas envolvidos.
+    <p class="lead">Este formulário formaliza a solicitação de uma nova demanda de projeto ou melhoria de TI e coleta as principais informações sobre necessidades, oportunidades ou problemas envolvidos.
       Ele ajuda a estabelecer o escopo e, no futuro, limites claros para determinar metas, prazos e entregáveis com qualidade.</p>
 
     <form id="form" novalidate>
@@ -179,10 +168,7 @@
             <p>Para viabilizar a execução da estratégia e o atingimento dos objetivos da empresa.</p>
             <ul>
               <li>Algo <b>novo</b>: sistema, integração, processo ou ferramenta</li>
-              <li><b>Alto esforço e alta complexidade</b> (acima de 120 horas)</li>
-              <li>Precisa de escopo, orçamento e cronograma</li>
             </ul>
-            <span class="rota">Na aprovação: Convertido em Projeto</span>
           </label>
           <label class="tipo mel">
             <input type="radio" name="tipo" value="Melhoria">
@@ -190,21 +176,7 @@
             <p>Para apoiar o atingimento das metas e a continuidade do negócio.</p>
             <ul>
               <li>Ajuste em algo que <b>já existe</b>: sistema, relatório ou rotina</li>
-              <li><b>Até 120 horas e baixa complexidade</b></li>
-              <li>Entrega rápida, em sprints de 2 a 4 semanas</li>
             </ul>
-            <span class="rota">Na aprovação: Convertido em Melhoria</span>
-          </label>
-          <label class="tipo aut">
-            <input type="radio" name="tipo" value="Solicitação de publicação">
-            <span class="t"><span class="check">✓</span> Solicitação de publicação</span>
-            <p>A área já criou a automação e precisa da TI para colocá-la para rodar.</p>
-            <ul>
-              <li>A ideia <b>já foi testada</b> pela área (prompt, agente, fluxo ou planilha)</li>
-              <li>A TI avalia <b>segurança, dados e acessos</b></li>
-              <li>A TI coloca para rodar no ambiente da empresa</li>
-            </ul>
-            <span class="rota">Na aprovação: Aprovado</span>
           </label>
         </div>
         <p class="help" style="margin:10px 0 0">Na dúvida, escolha a opção mais próxima. A TI confirma a classificação na análise.</p>
@@ -321,129 +293,6 @@
 
       </div>
 
-      <!-- ===== AUTOMAÇÃO DE PROCESSO (só aparece quando o tipo é Automação) ===== -->
-      <div id="grpAUT" hidden>
-      <div class="block">
-        <h2><span class="num">3</span> Sobre a automação</h2>
-        <div class="f" data-tip="aut_processo">
-          <div class="f-head"><svg><use href="#i-text"/></svg>Qual processo será automatizado? <span class="req">*</span></div>
-          <p class="help">Nome do processo ou da rotina.</p>
-          <input name="aut_processo" data-label="Processo a ser automatizado" required maxlength="255">
-        </div>
-        <div class="f" data-tip="aut_hoje">
-          <div class="f-head"><svg><use href="#i-note"/></svg>Como esse processo é feito hoje? <span class="req">*</span></div>
-          <p class="help">Quem faz, quais são os passos e quanto tempo leva.</p>
-          <textarea name="aut_hoje" data-label="Como o processo é feito hoje" required></textarea>
-        </div>
-        <div class="f" data-tip="aut_faz">
-          <div class="f-head"><svg><use href="#i-note"/></svg>O que a automação faz? <span class="req">*</span></div>
-          <p class="help">Do início ao fim: o que entra, o que a IA faz e o que sai.</p>
-          <textarea name="aut_faz" data-label="O que a automação faz" required></textarea>
-        </div>
-        <div class="f" data-tip="aut_ferramentas">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Com quais ferramentas ela foi feita? <span class="req">*</span></div>
-          <p class="help">Marque todas que se aplicam.</p>
-          <div class="checks" data-required data-name="aut_ferramentas" data-label="Ferramentas usadas">
-            <label><input type="checkbox" name="aut_ferramentas" value="Microsoft Copilot">Microsoft Copilot</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="ChatGPT">ChatGPT</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Claude">Claude</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Gemini">Gemini</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Power Automate">Power Automate</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Excel / Power Query">Excel / Power Query</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Script (Python, VBA etc.)">Script (Python, VBA etc.)</label>
-            <label><input type="checkbox" name="aut_ferramentas" value="Outra">Outra</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_estagio">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Em que estágio ela está? <span class="req">*</span></div>
-          <div class="radios" data-required data-name="aut_estagio" data-label="Estágio da automação">
-            <label><input type="radio" name="aut_estagio" value="Ideia: testei a IA manualmente algumas vezes.">Ideia: testei a IA manualmente algumas vezes.</label>
-            <label><input type="radio" name="aut_estagio" value="Protótipo: funciona na minha conta ou no meu computador.">Protótipo: funciona na minha conta ou no meu computador.</label>
-            <label><input type="radio" name="aut_estagio" value="Em uso: já ajuda no processo, mas rodo manualmente.">Em uso: já ajuda no processo, mas rodo manualmente.</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_link">
-          <div class="f-head"><svg><use href="#i-text"/></svg>Link do material da automação</div>
-          <p class="help">Prompt, arquivo, fluxo ou vídeo de demonstração no SharePoint ou no Teams. Nunca coloque senhas.</p>
-          <input name="aut_link" data-label="Link do material" maxlength="500" placeholder="Cole o link do SharePoint ou Teams">
-        </div>
-      </div>
-
-      <div class="block">
-        <h2><span class="num">4</span> Dados e acessos</h2>
-        <p class="aviso-ia">Estas respostas ajudam a TI a avaliar a <b>segurança</b> e a <b>LGPD</b> antes de colocar a automação para rodar.</p>
-        <div class="f" data-tip="aut_sistemas">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Onde a automação busca ou grava informações? <span class="req">*</span></div>
-          <div class="checks" data-required data-name="aut_sistemas" data-label="Sistemas e arquivos acessados">
-            <label><input type="checkbox" name="aut_sistemas" value="Outlook / e-mail">Outlook / e-mail</label>
-            <label><input type="checkbox" name="aut_sistemas" value="SharePoint / OneDrive">SharePoint / OneDrive</label>
-            <label><input type="checkbox" name="aut_sistemas" value="Teams">Teams</label>
-            <label><input type="checkbox" name="aut_sistemas" value="Excel / planilhas">Excel / planilhas</label>
-            <label><input type="checkbox" name="aut_sistemas" value="ERP (sistema de gestão)">ERP (sistema de gestão)</label>
-            <label><input type="checkbox" name="aut_sistemas" value="Site ou sistema externo">Site ou sistema externo</label>
-            <label><input type="checkbox" name="aut_sistemas" value="Nenhum: só texto digitado">Nenhum: só texto digitado</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_dados">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Que tipo de informação ela usa? <span class="req">*</span></div>
-          <div class="checks" data-required data-name="aut_dados" data-label="Tipo de informação usada">
-            <label><input type="checkbox" name="aut_dados" value="Dados gerais ou públicos">Dados gerais ou públicos</label>
-            <label><input type="checkbox" name="aut_dados" value="Dados internos da empresa">Dados internos da empresa</label>
-            <label><input type="checkbox" name="aut_dados" value="Dados pessoais de colaboradores ou clientes (LGPD)">Dados pessoais de colaboradores ou clientes (LGPD)</label>
-            <label><input type="checkbox" name="aut_dados" value="Dados financeiros ou fiscais">Dados financeiros ou fiscais</label>
-            <label><input type="checkbox" name="aut_dados" value="Informações confidenciais ou estratégicas">Informações confidenciais ou estratégicas</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_revisao">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Uma pessoa revisa o resultado antes de ele ser usado? <span class="req">*</span></div>
-          <div class="radios" data-required data-name="aut_revisao" data-label="Revisão humana do resultado">
-            <label><input type="radio" name="aut_revisao" value="Sim, sempre.">Sim, sempre.</label>
-            <label><input type="radio" name="aut_revisao" value="Às vezes.">Às vezes.</label>
-            <label><input type="radio" name="aut_revisao" value="Não: o resultado é enviado ou gravado direto.">Não: o resultado é enviado ou gravado direto.</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_frequencia">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Com que frequência ela vai rodar? <span class="req">*</span></div>
-          <div class="radios" data-required data-name="aut_frequencia" data-label="Frequência">
-            <label><input type="radio" name="aut_frequencia" value="Quando alguém pedir (sob demanda)">Quando alguém pedir (sob demanda)</label>
-            <label><input type="radio" name="aut_frequencia" value="Diária">Diária</label>
-            <label><input type="radio" name="aut_frequencia" value="Semanal">Semanal</label>
-            <label><input type="radio" name="aut_frequencia" value="Mensal">Mensal</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <h2><span class="num">5</span> Ganho esperado e responsável</h2>
-        <div class="f" data-tip="aut_horas">
-          <div class="f-head"><svg><use href="#i-text"/></svg>Quantas horas por mês esse processo consome hoje? <span class="req">*</span></div>
-          <p class="help">Estimativa, somando todas as pessoas envolvidas.</p>
-          <input name="aut_horas" data-label="Horas por mês consumidas hoje" required maxlength="20" inputmode="decimal">
-        </div>
-        <div class="f" data-tip="beneficio">
-          <div class="f-head"><svg><use href="#i-choice"/></svg>Qual o benefício estratégico? (Seleciona uma opção) <span class="req">*</span></div>
-          <div class="radios" data-required data-name="aut_beneficio" data-label="Qual o benefício estratégico?">
-            <label><input type="radio" name="aut_beneficio" value="Obrigação legal">Obrigação legal</label>
-            <label><input type="radio" name="aut_beneficio" value="Auditoria e compliance">Auditoria e compliance</label>
-            <label><input type="radio" name="aut_beneficio" value="Redução de custo">Redução de custo</label>
-            <label><input type="radio" name="aut_beneficio" value="Aumento de receita">Aumento de receita</label>
-            <label><input type="radio" name="aut_beneficio" value="Aumento de produtividade">Aumento de produtividade</label>
-            <label><input type="radio" name="aut_beneficio" value="Diferencial estratégico">Diferencial estratégico</label>
-          </div>
-        </div>
-        <div class="f" data-tip="aut_dono">
-          <div class="f-head"><svg><use href="#i-user"/></svg>Quem será o responsável pela automação na área? <span class="req">*</span></div>
-          <p class="help">A pessoa que acompanha o resultado e avisa a TI se o processo mudar.</p>
-          <input name="aut_dono" data-label="Responsável na área" required maxlength="120">
-        </div>
-        <div class="f" data-tip="aut_falha">
-          <div class="f-head"><svg><use href="#i-note"/></svg>O que acontece se a automação parar?</div>
-          <p class="help">Existe um jeito manual de continuar o trabalho?</p>
-          <textarea name="aut_falha" data-label="Se a automação parar"></textarea>
-        </div>
-      </div>
-      </div>
-
       <!-- ===== Uso exclusivo da TI ===== -->
       <div class="block ti">
         <h2><span class="num">6</span> Uso exclusivo da TI <span class="lock">🔒 preenchido pela TI</span></h2>
@@ -516,16 +365,7 @@
     processos:{ex:'Compras Internacionais\nDIMPEX\nLogística',na:'N/A'},
     procdoc:{t:'Se não souber, deixe sem resposta.'},
     obstaculos:{ex:'Projeto mal elaborado\nConflito de interesses\nFalta de engajamento dos setores',na:'N/A'},
-    implicacoes:{ex:'Continuaremos com peças repetidas e reclamação de falta de peças.',na:'N/A'},
-    aut_processo:{ex:'Conferência de notas fiscais de entrada'},
-    aut_hoje:{ex:'Duas pessoas do Fiscal abrem cada nota recebida por e-mail, conferem com o pedido no ERP e lançam as divergências numa planilha. Cerca de 3 horas por dia.'},
-    aut_faz:{ex:'Lê as notas que chegam no e-mail, compara com o pedido exportado do ERP e gera uma planilha só com as divergências para o Fiscal revisar.'},
-    aut_estagio:{t:'Não precisa estar pronta. A TI ajuda a levar a ideia para o ambiente da empresa.'},
-    aut_dados:{t:'Na dúvida, marque a opção mais sensível. Dados pessoais exigem cuidados da LGPD.'},
-    aut_revisao:{t:'Quando ninguém revisa, a TI avalia com mais cuidado o risco de erro da IA.'},
-    aut_horas:{ex:'60'},
-    aut_dono:{ex:'Maria Souza (Fiscal)'},
-    aut_falha:{ex:'O Fiscal volta a conferir as notas manualmente.',na:'N/A'}
+    implicacoes:{ex:'Continuaremos com peças repetidas e reclamação de falta de peças.',na:'N/A'}
   };
   document.querySelectorAll('[data-tip]').forEach(f => {
     const d = DICAS[f.dataset.tip]; if (!d) return;
@@ -553,11 +393,6 @@
     if (!sim) { txt.value = ''; box.querySelector('input').value = ''; txt.classList.remove('invalid'); }
   }));
 
-  // ====== Tipo: Automação usa um formulário próprio (blocos 3 a 5) ======
-  const ehAut = () => form.querySelector('[name="tipo"]:checked')?.value === 'Solicitação de publicação';
-  function trocarGrupo(){ $('#grpAUT').hidden = !ehAut(); $('#grpPM').hidden = ehAut(); }
-  form.querySelectorAll('[name="tipo"]').forEach(r => r.addEventListener('change', trocarGrupo));
-
   // ====== Validação ======
   function pendentes(){
     const lista = [];
@@ -583,24 +418,15 @@
     ['Sobre os benefícios esperados', ['objetivos','beneficio','retorno','sucesso']],
     ['Sobre impactos e riscos', ['processos','procdoc','obstaculos','implicacoes']]
   ];
-  const ORDEM_AUT = [
-    ['Tipo da demanda', [['Tipo da demanda','tipo']]],
-    ['Identificação', [['Título','titulo'],['Departamento','departamento'],['Solicitante da demanda','solicitante'],['E-mail do solicitante','email']]],
-    ['Sobre a automação', ['aut_processo','aut_hoje','aut_faz','aut_ferramentas','aut_estagio','aut_link']],
-    ['Dados e acessos', ['aut_sistemas','aut_dados','aut_revisao','aut_frequencia']],
-    ['Ganho esperado e responsável', ['aut_horas','aut_beneficio','aut_dono','aut_falha']]
-  ];
-  const CAMPOS_AUT = ['tipo','titulo','departamento','solicitante','email','aut_processo','aut_hoje','aut_faz','aut_ferramentas','aut_estagio','aut_link',
-                      'aut_sistemas','aut_dados','aut_revisao','aut_frequencia','aut_horas','aut_beneficio','aut_dono','aut_falha'];
   const CAMPOS_PM = ['tipo','titulo','departamento','solicitante','email','necessidade','justificativa','escopo','escopo_desc','escopo_link',
                   'objetivos','beneficio','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
-  const ordem = () => ehAut() ? ORDEM_AUT : ORDEM_PM;
+  const ordem = () => ORDEM_PM;
   function rotulo(n){ const el = form.querySelector(`[name="${n}"]`); return el.closest('.radios,.checks')?.dataset.label || el.dataset.label; }
   function linhas(){
     const out = [];
     ordem().forEach(([, campos]) => campos.forEach(c => {
       const [lbl, n] = Array.isArray(c) ? c : [rotulo(c), c];
-      const v = valor(n); if (v || !['escopo_desc','escopo_link','aut_link'].includes(n)) out.push([lbl, v || '—', n]);
+      const v = valor(n); if (v || !['escopo_desc','escopo_link'].includes(n)) out.push([lbl, v || '—', n]);
     }));
     return out;
   }
@@ -634,7 +460,7 @@
   const REC = '\u00a0'.repeat(6);   // espaço que não some no PDF
   function detalhesFormatado(){
     const pular = ['tipo','titulo','departamento','solicitante','email'];   // já aparecem no cabeçalho do PDF
-    const opcionais = ['escopo_desc','escopo_link','aut_link','aut_falha','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
+    const opcionais = ['escopo_desc','escopo_link','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
     const out = [];
     ordem().forEach(([titulo, campos]) => {
       const nomes = campos.map(c => Array.isArray(c) ? c[1] : c).filter(n => !pular.includes(n));
@@ -668,15 +494,15 @@
     if (form.querySelector('[name="website"]').value) return;            // armadilha anti-robô
     const btn = $('#sendBtn'); btn.disabled = true; btn.textContent = 'Enviando…'; $('#sendMsg').textContent = '';
     const tipo = valor('tipo'), titulo = valor('titulo'), nome = valor('solicitante'), depto = valor('departamento');
-    const campos = {}; (ehAut() ? CAMPOS_AUT : CAMPOS_PM).forEach(n => campos[n] = valor(n));
+    const campos = {}; CAMPOS_PM.forEach(n => campos[n] = valor(n));
     const ls = linhas();
     const detalhes = detalhesFormatado();
     const dados = { tipo, ambiente: 'Produção', titulo, solicitante: nome, email: valor('email'), setor: depto,
-      prioridade: '', prazo: '', referencia: '', beneficio: valor(ehAut() ? 'aut_beneficio' : 'beneficio'), detalhes, campos,
+      prioridade: '', prazo: '', referencia: '', beneficio: valor('beneficio'), detalhes, campos,
       ajuste: AJ.id || '', token: AJ.token || '', resposta: AJ.id ? valor('resposta') : '' };
     const payload = {
       access_key: ACCESS_KEY,
-      subject: `${AJ.id ? `[AJUSTE #${AJ.id}] ` : ''}[${ehAut() ? 'AUTOMACAO' : tipo.toUpperCase()}] ${titulo} — ${nome} (${depto})`,
+      subject: `${AJ.id ? `[AJUSTE #${AJ.id}] ` : ''}[${tipo.toUpperCase()}] ${titulo} — ${nome} (${depto})`,
       from_name: 'Solicitações JCESA', replyto: valor('email')
     };
     if (AJ.id) payload['Resposta ao PMO'] = valor('resposta');
@@ -690,7 +516,7 @@
       $('#doneTitle').textContent = AJ.id ? 'Complemento enviado!' : 'Solicitação enviada!';
       $('#doneMsg').innerHTML = AJ.id
         ? `Obrigado. Sua solicitação <b>${esc(titulo)}</b> voltou para análise do PMO com o status <b>Aguardando análise</b>. Você receberá o retorno por e-mail.`
-        : `${tipo === 'Projeto' ? 'Seu <b>projeto</b>' : tipo === 'Solicitação de publicação' ? 'Sua <b>solicitação de publicação</b>' : 'Sua <b>melhoria</b>'} <b>${esc(titulo)}</b> foi ${tipo === 'Projeto' ? 'registrado' : 'registrada'} com o status <b>Pré escopo (Em Análise)</b>. O PMO vai analisar e você receberá o retorno por e-mail em <b>${esc(valor('email'))}</b>.`;
+        : `${tipo === 'Projeto' ? 'Seu <b>projeto</b>' : 'Sua <b>melhoria</b>'} <b>${esc(titulo)}</b> foi ${tipo === 'Projeto' ? 'registrado' : 'registrada'} com o status <b>Pré escopo (Em Análise)</b>. O PMO vai analisar e você receberá o retorno por e-mail em <b>${esc(valor('email'))}</b>.`;
       if (PROTOTIPO) $('#doneMsg').innerHTML += '<br><br><i>(Protótipo: nada foi enviado.)</i>';
       mostrar('#doneView');
     } catch (err) {
@@ -701,7 +527,7 @@
 
   $('#newBtn').addEventListener('click', () => {
     if (AJ.id) { location.href = location.pathname; return; }               // sai do modo complemento
-    form.reset(); trocarGrupo(); $('#escopoBox').hidden = true; $('#escopoBox textarea').required = false;
+    form.reset(); $('#escopoBox').hidden = true; $('#escopoBox textarea').required = false;
     form.querySelectorAll('.tip-box').forEach(b => b.hidden = true); mostrar('#formView');
   });
   function mostrar(sel){ ['#formView','#reviewView','#doneView'].forEach(s => $(s).hidden = s !== sel); window.scrollTo({top:0, behavior:'smooth'}); }
@@ -733,11 +559,7 @@
     if (pend.length) { $('#ajPend').innerHTML = pend.map(x => `<span class="tag-pend">${esc(x)}</span>`).join(''); $('#ajPend').hidden = false; }
     const MAPA = { 'Custo / orçamento': ['retorno'], 'Benefícios': ['objetivos','beneficio','retorno','sucesso'],
       'Escopo': ['necessidade','escopo'], 'Processos impactados': ['processos','procdoc'], 'Riscos': ['obstaculos','implicacoes'] };
-    const MAPA_AUT = { 'Custo / orçamento': ['aut_horas'], 'Benefícios': ['aut_horas','aut_beneficio'],
-      'Escopo': ['aut_processo','aut_hoje','aut_faz','aut_ferramentas','aut_estagio','aut_link'], 'Prazo': ['aut_frequencia'],
-      'Processos impactados': ['aut_sistemas','aut_dados'], 'Riscos': ['aut_revisao','aut_falha','aut_dados'], 'Outros': [] };
-    const mapa = campos.tipo === 'Solicitação de publicação' ? MAPA_AUT : MAPA;
-    pend.forEach(x => (mapa[x] || []).forEach(n => form.querySelector(`[name="${n}"]`)?.closest('.f')?.classList.add('pend')));
+    pend.forEach(x => (MAPA[x] || []).forEach(n => form.querySelector(`[name="${n}"]`)?.closest('.f')?.classList.add('pend')));
     $('#ajusteBox').hidden = false;
     $('#ajusteBox textarea').required = true;
     document.querySelector('h1').textContent = 'Complemento da solicitação';

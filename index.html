@@ -631,6 +631,7 @@
 
 
   // ====== Texto de detalhes do PDF: em seções, com tópicos (sem repetir o cabeçalho) ======
+  const REC = '\u00a0'.repeat(6);   // espaço que não some no PDF
   function detalhesFormatado(){
     const pular = ['tipo','titulo','departamento','solicitante','email'];   // já aparecem no cabeçalho do PDF
     const opcionais = ['escopo_desc','escopo_link','aut_link','aut_falha','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
@@ -650,7 +651,7 @@
         out.push('• ' + it.rotulo);
         it.vals.forEach(line => {
           const t = line.trim();
-          out.push(it.lista ? '      – ' + t : '      ' + t);
+          out.push(it.lista ? REC + '– ' + t : REC + t);
         });
       });
     });
@@ -688,7 +689,7 @@
       if (!out.success) throw new Error(out.message || 'Falha no envio'); }
       $('#doneTitle').textContent = AJ.id ? 'Complemento enviado!' : 'Solicitação enviada!';
       $('#doneMsg').innerHTML = AJ.id
-        ? `Obrigado. Sua solicitação <b>${esc(titulo)}</b> voltou para análise do PMO com o status <b>Pré escopo (Em Análise)</b>. Você receberá o retorno por e-mail.`
+        ? `Obrigado. Sua solicitação <b>${esc(titulo)}</b> voltou para análise do PMO com o status <b>Aguardando análise</b>. Você receberá o retorno por e-mail.`
         : `${tipo === 'Projeto' ? 'Seu <b>projeto</b>' : tipo === 'Solicitação de publicação' ? 'Sua <b>solicitação de publicação</b>' : 'Sua <b>melhoria</b>'} <b>${esc(titulo)}</b> foi ${tipo === 'Projeto' ? 'registrado' : 'registrada'} com o status <b>Pré escopo (Em Análise)</b>. O PMO vai analisar e você receberá o retorno por e-mail em <b>${esc(valor('email'))}</b>.`;
       if (PROTOTIPO) $('#doneMsg').innerHTML += '<br><br><i>(Protótipo: nada foi enviado.)</i>';
       mostrar('#doneView');

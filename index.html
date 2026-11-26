@@ -203,10 +203,21 @@
         </div>
       </div>
 
+      <div class="block">
+        <h2><span class="num">3</span> Protótipo</h2>
+        <div class="f" data-tip="prototipo">
+          <div class="f-head"><svg><use href="#i-choice"/></svg>Você já tem algum protótipo desenvolvido? <span class="req">*</span></div>
+          <div class="radios" data-required data-name="prototipo" data-label="Você já tem algum protótipo desenvolvido?">
+            <label><input type="radio" name="prototipo" value="Já tenho um protótipo desenvolvido">Já tenho um protótipo desenvolvido</label>
+            <label><input type="radio" name="prototipo" value="Ainda não possuo protótipo">Ainda não possuo protótipo</label>
+          </div>
+        </div>
+      </div>
+
       <div id="grpPM">
       <!-- ===== Necessidades e oportunidades ===== -->
       <div class="block">
-        <h2><span class="num">3</span> Sobre as necessidades e oportunidades da demanda</h2>
+        <h2><span class="num">4</span> Sobre as necessidades e oportunidades da demanda</h2>
         <div class="f" data-tip="necessidade">
           <div class="f-head"><svg><use href="#i-note"/></svg>Descreva de forma detalhada sua necessidade: (Qual a sua demanda?) <span class="req">*</span></div>
           <textarea name="necessidade" data-label="Descreva de forma detalhada sua necessidade: (Qual a sua demanda?)" required></textarea>
@@ -236,7 +247,7 @@
 
       <!-- ===== Benefícios esperados ===== -->
       <div class="block">
-        <h2><span class="num">4</span> Sobre os benefícios esperados</h2>
+        <h2><span class="num">5</span> Sobre os benefícios esperados</h2>
         <div class="f" data-tip="objetivos">
           <div class="f-head"><svg><use href="#i-note"/></svg>Quais são os objetivos finais? (objetivos a curto, médio e longo prazo?) <span class="req">*</span></div>
           <textarea name="objetivos" data-label="Quais são os objetivos finais? (objetivos a curto, médio e longo prazo?)" required></textarea>
@@ -265,7 +276,7 @@
 
       <!-- ===== Impactos e riscos ===== -->
       <div class="block">
-        <h2><span class="num">5</span> Sobre impactos e riscos</h2>
+        <h2><span class="num">6</span> Sobre impactos e riscos</h2>
         <div class="f" data-tip="processos">
           <div class="f-head"><svg><use href="#i-note"/></svg>Quais processos serão impactados com esta demanda?</div>
           <textarea name="processos" data-label="Quais processos serão impactados com esta demanda?"></textarea>
@@ -293,7 +304,7 @@
 
       <!-- ===== Uso exclusivo da TI ===== -->
       <div class="block ti">
-        <h2><span class="num">6</span> Uso exclusivo da TI <span class="lock">🔒 preenchido pela TI</span></h2>
+        <h2><span class="num">7</span> Uso exclusivo da TI <span class="lock">🔒 preenchido pela TI</span></h2>
         <div class="f">
           <div class="f-head"><svg><use href="#i-choice"/></svg>Status da demanda (Uso da TI)</div>
           <p class="help">Toda demanda nova entra como <b>Pré escopo (Em Análise)</b>. A TI atualiza o status a cada etapa e você recebe um e-mail a cada mudança.</p>
@@ -412,11 +423,12 @@
   const ORDEM_PM = [
     ['Tipo da demanda', [['Tipo da demanda','tipo']]],
     ['Identificação', [['Título','titulo'],['Departamento','departamento'],['Solicitante da demanda','solicitante'],['E-mail do solicitante','email']]],
+    ['Protótipo', ['prototipo']],
     ['Sobre as necessidades e oportunidades da demanda', ['necessidade','justificativa','escopo','escopo_desc','escopo_link']],
     ['Sobre os benefícios esperados', ['objetivos','beneficio','retorno','sucesso']],
     ['Sobre impactos e riscos', ['processos','procdoc','obstaculos','implicacoes']]
   ];
-  const CAMPOS_PM = ['tipo','titulo','departamento','solicitante','email','necessidade','justificativa','escopo','escopo_desc','escopo_link',
+  const CAMPOS_PM = ['tipo','titulo','departamento','solicitante','email','prototipo','necessidade','justificativa','escopo','escopo_desc','escopo_link',
                   'objetivos','beneficio','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
   const ordem = () => ORDEM_PM;
   function rotulo(n){ const el = form.querySelector(`[name="${n}"]`); return el.closest('.radios,.checks')?.dataset.label || el.dataset.label; }

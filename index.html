@@ -71,6 +71,18 @@
   .tipo li{margin:2px 0}
   .tipo .rota{display:inline-block;margin-top:10px;font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 10px;background:#eef1f7;color:var(--brand-dark)}
   .tipos.invalid{box-shadow:none}.tipos.invalid .tipo{border-color:var(--err)}
+  @media (min-width:640px){.tipos.tres{grid-template-columns:repeat(3,1fr)}}
+  .tipo.modo{padding:16px 14px 14px 20px}
+  .tipo.modo .t{font-size:1.02rem}
+  .rec{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+  .rec-btn{border:0;border-radius:999px;padding:11px 20px;font:inherit;font-weight:700;color:#fff;background:var(--accent);cursor:pointer}
+  .rec-btn.on{background:var(--brand)}
+  .rec-btn:disabled{opacity:.45;cursor:not-allowed}
+  .rec-msg{font-size:.86rem;color:var(--muted)}
+  .rec-msg.err{color:var(--err);font-weight:600}
+  .rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:6px;animation:pulsa 1s infinite}
+  @keyframes pulsa{50%{opacity:.25}}
+  input[type=file]{padding:9px 12px;cursor:pointer}
 
   /* Dicas */
   .tip-btn{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--brand);background:#fff;color:var(--brand);font:700 .72rem/1 Manrope,system-ui,sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
@@ -180,6 +192,27 @@
         <p class="help" style="margin:10px 0 0">Na dúvida, escolha a opção mais próxima. A TI confirma a classificação na análise.</p>
       </div>
 
+      <!-- ===== Como descrever a demanda (aparece depois de escolher o tipo) ===== -->
+      <div class="block" id="modoBox" hidden>
+        <h2><span class="num">2</span> Como você quer descrever a demanda? <span class="req">*</span></h2>
+        <div class="tipos tres" id="modos" data-required>
+          <label class="tipo modo">
+            <input type="radio" name="modo" value="Preencher o formulário" data-label="Forma de descrição">
+            <span class="t"><span class="check">✓</span> Preencher o formulário</span>
+          </label>
+          <label class="tipo modo">
+            <input type="radio" name="modo" value="Gravar um áudio" data-label="Forma de descrição">
+            <span class="t"><span class="check">✓</span> Gravar um áudio</span>
+          </label>
+          <label class="tipo modo">
+            <input type="radio" name="modo" value="Anexar um documento" data-label="Forma de descrição">
+            <span class="t"><span class="check">✓</span> Anexar um documento</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="resto" hidden>
+
       <!-- ===== Identificação ===== -->
       <div class="block">
         <h2><span class="num">2</span> Identificação</h2>
@@ -211,6 +244,31 @@
             <label><input type="radio" name="prototipo" value="Já tenho um protótipo desenvolvido">Já tenho um protótipo desenvolvido</label>
             <label><input type="radio" name="prototipo" value="Ainda não possuo protótipo">Ainda não possuo protótipo</label>
           </div>
+        </div>
+      </div>
+
+      <!-- ===== Gravar um áudio ===== -->
+      <div class="block" id="grpAUD" hidden>
+        <h2><span class="num">5</span> Grave a sua demanda</h2>
+        <div class="f">
+          <div class="f-head"><svg><use href="#i-note"/></svg>Conte a sua demanda falando <span class="req">*</span></div>
+          <p class="help">Clique em Gravar e fale. O texto aparece abaixo e você pode corrigi-lo antes de enviar.</p>
+          <div class="rec"><button type="button" class="rec-btn" id="recBtn">● Gravar</button><span class="rec-msg" id="recMsg"></span></div>
+          <textarea name="audio_texto" id="audioTxt" data-label="Descrição da demanda (áudio transcrito)" maxlength="6000" required style="min-height:180px"></textarea>
+        </div>
+      </div>
+
+      <!-- ===== Anexar um documento ===== -->
+      <div class="block" id="grpDOC" hidden>
+        <h2><span class="num">5</span> Anexe o documento</h2>
+        <div class="f">
+          <div class="f-head"><svg><use href="#i-note"/></svg>Documento com a descrição da demanda <span class="req">*</span></div>
+          <p class="help">Aceita Word (.docx), texto (.txt) e PDF com texto. O conteúdo é lido aqui, no seu navegador, e enviado junto com a solicitação.</p>
+          <input type="file" id="docFile" accept=".docx,.txt,.pdf">
+          <input type="hidden" name="doc_nome" data-label="Nome do documento">
+          <p class="rec-msg" id="docMsg" style="margin:8px 0 8px"></p>
+          <div class="f-head" style="margin-top:6px">Texto lido do documento (confira)</div>
+          <textarea name="doc_texto" id="docTxt" data-label="Texto do documento" maxlength="6000" required style="min-height:200px"></textarea>
         </div>
       </div>
 
@@ -326,6 +384,7 @@
           <div class="ro">Preenchido pela TI (ex.: Bloco 3)</div>
         </div>
       </div>
+      </div><!-- /resto -->
 
       <div class="actions">
         <span id="status" role="status" aria-live="polite"></span>
@@ -402,6 +461,122 @@
     if (!sim) { txt.value = ''; box.querySelector('input').value = ''; txt.classList.remove('invalid'); }
   }));
 
+  // ====== Forma de descrever: formulário, áudio ou documento ======
+  const LIMITE = 6000;
+  function renumerar(){
+    let n = 0;
+    form.querySelectorAll('.block').forEach(b => { if (b.classList.contains('ajuste') || b.closest('[hidden]')) return; const num = b.querySelector('.num'); if (num) num.textContent = ++n; });
+  }
+  function atualizarModo(){
+    const tipoOk = !!form.querySelector('[name="tipo"]:checked');
+    $('#modoBox').hidden = !tipoOk;
+    const m = tipoOk ? form.querySelector('[name="modo"]:checked')?.value : '';
+    $('#resto').hidden = !m;
+    $('#grpPM').hidden = m !== MODO.form;
+    $('#grpAUD').hidden = m !== MODO.aud;
+    $('#grpDOC').hidden = m !== MODO.doc;
+    if (m !== MODO.aud) pararGravacao();
+    renumerar();
+  }
+  form.querySelectorAll('[name="tipo"],[name="modo"]').forEach(r => r.addEventListener('change', atualizarModo));
+
+  // --- Gravar um áudio: o navegador transcreve a fala em texto (Chrome e Edge) ---
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let reco = null, gravando = false, baseTxt = '';
+  const recBtn = $('#recBtn'), recMsg = $('#recMsg'), audioTxt = $('#audioTxt');
+  function msgRec(t, erro){ recMsg.textContent = t; recMsg.className = 'rec-msg' + (erro ? ' err' : ''); }
+  function pararGravacao(){
+    gravando = false;
+    try { reco && reco.stop(); } catch (e) {}
+    recBtn.classList.remove('on'); recBtn.textContent = '● Gravar';
+    if (recMsg.dataset.rec) { msgRec(''); delete recMsg.dataset.rec; }
+  }
+  function iniciarReco(){
+    reco = new SR(); reco.lang = 'pt-BR'; reco.continuous = true; reco.interimResults = true;
+    reco.onresult = e => {
+      let fin = '', par = '';
+      for (let i = 0; i < e.results.length; i++) (e.results[i].isFinal ? (fin += e.results[i][0].transcript) : (par += e.results[i][0].transcript));
+      audioTxt.value = (baseTxt + fin + par).slice(0, LIMITE); audioTxt.classList.remove('invalid'); if (!pendentes().length) $('#status').textContent = '';
+    };
+    reco.onerror = e => {
+      if (e.error === 'no-speech' || e.error === 'aborted') return;
+      pararGravacao();
+      msgRec(e.error === 'not-allowed' || e.error === 'service-not-allowed'
+        ? 'Permita o uso do microfone no navegador e tente de novo.'
+        : 'Não foi possível gravar agora. Escreva a demanda na caixa abaixo.', true);
+    };
+    reco.onend = () => { if (gravando) { baseTxt = audioTxt.value.trim() ? audioTxt.value.trim() + ' ' : ''; try { iniciarReco(); } catch (e) { pararGravacao(); } } };
+    reco.start();
+  }
+  if (!SR) { recBtn.disabled = true; msgRec('Este navegador não grava áudio. Use o Chrome ou o Edge, ou escreva a demanda na caixa abaixo.', true); }
+  recBtn.addEventListener('click', () => {
+    if (gravando) { pararGravacao(); return; }
+    baseTxt = audioTxt.value.trim() ? audioTxt.value.trim() + ' ' : '';
+    gravando = true; recBtn.classList.add('on'); recBtn.textContent = '■ Parar';
+    recMsg.dataset.rec = '1'; recMsg.className = 'rec-msg'; recMsg.innerHTML = '<span class="rec-dot"></span>Gravando… fale agora.';
+    try { iniciarReco(); } catch (e) { pararGravacao(); msgRec('Não foi possível gravar agora.', true); }
+  });
+
+  // --- Anexar um documento: lê o texto no navegador (.txt, .docx e PDF com texto) ---
+  async function lerDocx(buf){
+    const u8 = new Uint8Array(buf), dv = new DataView(buf);
+    let e = u8.length - 22; while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+    if (e < 0) throw new Error('zip');
+    let n = dv.getUint16(e + 10, true), p = dv.getUint32(e + 16, true);
+    for (; n > 0 && dv.getUint32(p, true) === 0x02014b50; n--) {
+      const met = dv.getUint16(p + 10, true), cs = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true),
+            xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+      if (new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl)) === 'word/document.xml') {
+        const ini = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), dados = u8.subarray(ini, ini + cs);
+        const xml = met === 0 ? new TextDecoder().decode(dados)
+          : await new Response(new Blob([dados]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+        const doc = new DOMParser().parseFromString(xml, 'application/xml'), W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+        return [...doc.getElementsByTagNameNS(W, 'p')].map(par => {
+          let t = ''; par.querySelectorAll('*').forEach(el => {
+            if (el.localName === 't') t += el.textContent; else if (el.localName === 'tab') t += '\t'; else if (el.localName === 'br') t += '\n';
+          }); return t;
+        }).join('\n');
+      }
+      p += 46 + nl + xl + cl;
+    }
+    throw new Error('sem document.xml');
+  }
+  function carregarScript(src){ return new Promise((ok, erro) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => erro(new Error('script')); document.head.append(s); }); }
+  async function lerPdf(buf){
+    if (!window.pdfjsLib) {
+      await carregarScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+    const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+    let out = '';
+    for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
+      const tc = await (await pdf.getPage(i)).getTextContent();
+      tc.items.forEach(it => { out += it.str + (it.hasEOL ? '\n' : ' '); }); out += '\n';
+    }
+    return out;
+  }
+  const docMsg = $('#docMsg'), docTxt = $('#docTxt');
+  function msgDoc(t, erro){ docMsg.textContent = t; docMsg.className = 'rec-msg' + (erro ? ' err' : ''); docMsg.style.margin = '8px 0'; }
+  $('#docFile').addEventListener('change', async ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    form.querySelector('[name="doc_nome"]').value = f.name; docTxt.value = '';
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    msgDoc('Lendo o documento…');
+    try {
+      const buf = await f.arrayBuffer();
+      let txt = ext === 'docx' ? await lerDocx(buf) : ext === 'pdf' ? await lerPdf(buf) : ext === 'txt' ? new TextDecoder('utf-8').decode(buf) : null;
+      if (txt === null) throw new Error('formato');
+      txt = txt.replace(/\r/g, '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+      if (!txt) { msgDoc('Não encontrei texto neste arquivo (pode ser uma imagem escaneada). Escolha outro arquivo ou escreva o texto na caixa abaixo.', true); return; }
+      const longo = txt.length > LIMITE;
+      docTxt.value = txt.slice(0, LIMITE); docTxt.classList.remove('invalid'); if (!pendentes().length) $('#status').textContent = '';
+      msgDoc(longo ? `Documento lido. Ele tem mais de ${LIMITE.toLocaleString('pt-BR')} caracteres: só o início será enviado.` : 'Documento lido: ' + f.name);
+    } catch (err) {
+      console.error(err);
+      msgDoc('Não consegui ler este arquivo. Use .docx, .txt ou PDF com texto, ou escreva o texto na caixa abaixo.', true);
+    }
+  });
+
   // ====== Validação ======
   function pendentes(){
     const lista = [];
@@ -421,7 +596,7 @@
     return el.type === 'radio' ? (form.querySelector(`[name="${nome}"]:checked`)?.value || '') : el.value.trim();
   }
   const ORDEM_PM = [
-    ['Tipo da demanda', [['Tipo da demanda','tipo']]],
+    ['Tipo da demanda', [['Tipo da demanda','tipo'],['Forma de descrição','modo']]],
     ['Identificação', [['Título','titulo'],['Departamento','departamento'],['Solicitante da demanda','solicitante'],['E-mail do solicitante','email']]],
     ['Protótipo', ['prototipo']],
     ['Sobre as necessidades e oportunidades da demanda', ['necessidade','justificativa','escopo','escopo_desc','escopo_link']],
@@ -430,7 +605,21 @@
   ];
   const CAMPOS_PM = ['tipo','titulo','departamento','solicitante','email','prototipo','necessidade','justificativa','escopo','escopo_desc','escopo_link',
                   'objetivos','beneficio','retorno','sucesso','processos','procdoc','obstaculos','implicacoes'];
-  const ordem = () => ORDEM_PM;
+  const MODO = { form: 'Preencher o formulário', aud: 'Gravar um áudio', doc: 'Anexar um documento' };
+  function ordem(){
+    const m = form.querySelector('[name="modo"]:checked')?.value;
+    const topo = ORDEM_PM.slice(0, 3);                       // tipo + forma, identificação, protótipo
+    if (m === MODO.aud) return [...topo, ['Descrição da demanda (áudio transcrito)', ['audio_texto']]];
+    if (m === MODO.doc) return [...topo, ['Descrição da demanda (documento)', ['doc_nome','doc_texto']]];
+    return ORDEM_PM;
+  }
+  function nomesCampos(){
+    const m = form.querySelector('[name="modo"]:checked')?.value;
+    const base = ['tipo','modo','titulo','departamento','solicitante','email','prototipo'];
+    if (m === MODO.aud) return [...base, 'audio_texto'];
+    if (m === MODO.doc) return [...base, 'doc_nome','doc_texto'];
+    return [...base, ...CAMPOS_PM.slice(6)];
+  }
   function rotulo(n){ const el = form.querySelector(`[name="${n}"]`); return el.closest('.radios,.checks')?.dataset.label || el.dataset.label; }
   function linhas(){
     const out = [];
@@ -504,7 +693,7 @@
     if (form.querySelector('[name="website"]').value) return;            // armadilha anti-robô
     const btn = $('#sendBtn'); btn.disabled = true; btn.textContent = 'Enviando…'; $('#sendMsg').textContent = '';
     const tipo = valor('tipo'), titulo = valor('titulo'), nome = valor('solicitante'), depto = valor('departamento');
-    const campos = {}; CAMPOS_PM.forEach(n => campos[n] = valor(n));
+    const campos = {}; nomesCampos().forEach(n => campos[n] = valor(n));
     const ls = linhas();
     const detalhes = detalhesFormatado();
     const dados = { tipo, ambiente: 'Produção', titulo, solicitante: nome, email: valor('email'), setor: depto,
@@ -521,8 +710,8 @@
     try {
       if (PROTOTIPO) { console.log('Protótipo: assunto', payload.subject, dados); await new Promise(ok => setTimeout(ok, 600)); } else {
       const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
-      const out = await r.json();
-      if (!out.success) throw new Error(out.message || 'Falha no envio'); }
+      let out = {}; try { out = await r.json(); } catch (e) { throw new Error('resposta HTTP ' + r.status); }
+      if (!out.success) throw new Error(out.message || ('resposta HTTP ' + r.status)); }
       $('#doneTitle').textContent = AJ.id ? 'Complemento enviado!' : 'Solicitação enviada!';
       $('#doneMsg').innerHTML = AJ.id
         ? `Obrigado. Sua solicitação <b>${esc(titulo)}</b> voltou para análise do PMO com o status <b>Aguardando análise</b>. Você receberá o retorno por e-mail.`
@@ -531,15 +720,16 @@
       mostrar('#doneView');
     } catch (err) {
       console.error(err);
-      $('#sendMsg').textContent = 'Não foi possível enviar agora. Tente novamente em alguns minutos.';
+      $('#sendMsg').textContent = 'Não foi possível enviar agora. Clique em Enviar de novo em alguns minutos. (Motivo: ' + (err && err.message === 'Failed to fetch' ? 'sem conexão com o serviço de envio' : (err && err.message) || 'desconhecido') + ')';
     } finally { btn.disabled = false; btn.textContent = 'Enviar solicitação'; }
   });
 
   $('#newBtn').addEventListener('click', () => {
     if (AJ.id) { location.href = location.pathname; return; }               // sai do modo complemento
-    form.reset(); $('#escopoBox').hidden = true; $('#escopoBox textarea').required = false;
+    form.reset(); $('#escopoBox').hidden = true; $('#escopoBox textarea').required = false; msgDoc(''); msgRec(''); atualizarModo();
     form.querySelectorAll('.tip-box').forEach(b => b.hidden = true); mostrar('#formView');
   });
+  atualizarModo();
   function mostrar(sel){ ['#formView','#reviewView','#doneView'].forEach(s => $(s).hidden = s !== sel); window.scrollTo({top:0, behavior:'smooth'}); }
 
   // ====== Modo complemento: link do e-mail de Bloqueado ======
@@ -562,6 +752,7 @@
       if (els[0].type === 'radio') { els.forEach(r => { if (r.value === v) { r.checked = true; r.dispatchEvent(new Event('change', {bubbles:true})); } }); }
       else els[0].value = v;
     });
+    if (!form.querySelector('[name="modo"]:checked')) { const r = form.querySelector(`[name="modo"][value="${MODO.form}"]`); r.checked = true; r.dispatchEvent(new Event('change', {bubbles:true})); }
     // Mostra a caixa de complemento
     $('#ajId').textContent = '#' + AJ.id + (campos.titulo ? ' · ' + campos.titulo : '');
     if (h.o) { $('#ajOrient').innerHTML = `<b>Orientação do PMO</b>${esc(h.o)}`; $('#ajOrient').hidden = false; }
